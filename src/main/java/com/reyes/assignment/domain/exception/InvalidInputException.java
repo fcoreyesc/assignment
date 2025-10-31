@@ -1,10 +1,10 @@
 package com.reyes.assignment.domain.exception;
 
 /**
- * Handle the exception when the user input is invalid
+ * Handle the exception when the input is invalid
  */
-public class UserInputException extends DomainException {
-    public UserInputException(String message) {
-        super(message);
+public class InvalidInputException extends DomainException {
+    public InvalidInputException(String message, Parameter... parameters) {
+        super(message, parameters);
     }
 }

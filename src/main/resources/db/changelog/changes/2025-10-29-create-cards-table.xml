@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="2025-10-29-create-cards-table" author="francisco">
+        <createTable tableName="cards">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+                <defaultValueComputed>gen_random_uuid()</defaultValueComputed>
+            </column>
+
+            <column name="account_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_cards_account"
+                             referencedTableName="accounts" referencedColumnNames="id"/>
+            </column>
+
+            <column name="pan_masked" type="VARCHAR(32)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="card_type" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="version" type="BIGINT"/>
+
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"
+                    defaultValueComputed="CURRENT_TIMESTAMP"/>
+
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uk_cards_account_type"
+                tableName="cards"
+                columnNames="account_id, card_type"/>
+
+        <createIndex
+                indexName="idx_cards_account"
+                tableName="cards">
+            <column name="account_id"/>
+        </createIndex>
+
+        <createIndex
+                indexName="idx_cards_type"
+                tableName="cards">
+            <column name="card_type"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

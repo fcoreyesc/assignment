@@ -1,4 +1,4 @@
-package com.reyes.assignment.domain;
+package com.reyes.assignment.domain.transaction;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,6 @@ public class Transaction {
     private UUID accountId;
     private TransactionType transactionType;
     private BigDecimal amount;
-    private BigDecimal fee;
     private BigDecimal balance;
     private String description;
     private LocalDateTime createdAt;

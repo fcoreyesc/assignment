@@ -1,4 +1,4 @@
-package com.reyes.assignment.domain;
+package com.reyes.assignment.domain.bankaccount;
 
 import com.reyes.assignment.domain.card.Card;
 import com.reyes.assignment.domain.card.CardType;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @ToString
 @EqualsAndHashCode
-@Builder
+@Builder(toBuilder = true)
 public class BankAccount {
 
     private UUID id;
@@ -27,17 +27,26 @@ public class BankAccount {
     private BigDecimal balance = BigDecimal.ZERO;
     private Map<CardType, Card> cards;
 
+    private void validateAmount(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidInputException("amount-cannot-be-negative", Parameter.of("amount", amount.toString()));
+        }
+
+    }
+
     private void validateBalance(BigDecimal amount) {
         var newBalance = balance.add(amount.negate());
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new InvalidInputException("balance-cannot-be-negative", Parameter.of("amount", amount.toString()));
+            throw new InvalidInputException("balance-cannot-be-negative", Parameter.of("amount", amount.toString()),Parameter.of("newBalance", newBalance.toString()));
         }
 
     }
 
     public PaymentMadeEvent pay(Card card,String description, BigDecimal amount) {
+        validateAmount(amount);
+
         var fee = card.calculateFee(amount);
-        var totalAmount = amount.add(fee);
+        var totalAmount = amount.add(fee).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         validateBalance(totalAmount);
         balance = balance.subtract(totalAmount);
@@ -83,9 +92,24 @@ public class BankAccount {
 //    }
 //
 //
-//    public Transaction withdraw(BigDecimal amount) {
-//        validateBalance(amount);
-//    }
+    public Transaction withdraw(BigDecimal amount) {
+        validateAmount(amount);
+
+        var fee = card.calculateFee(amount);
+        var totalAmount = amount.add(fee).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        validateBalance(totalAmount);
+        balance = balance.subtract(totalAmount);
+
+        return  PaymentMadeEvent.builder()
+                .accountId(id)
+                .balance(balance)
+                .description(description)
+                .cardType(card.getType())
+                .fee(fee)
+                .amount(amount)
+                .build();
+    }
 //
 //    public Transaction deposit(BigDecimal amount) {
 //

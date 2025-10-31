@@ -1,39 +1,40 @@
-package com.reyes.assignment.command;
+package com.reyes.assignment.command.payment;
 
-import com.reyes.assignment.domain.bankaccount.BankAccounts;
 import com.reyes.assignment.domain.payment.PaymentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/accounts")
 public class PaymentCommand {
 
-    private BankAccounts bankAccounts;
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
+    private final PaymentMapper paymentMapper;
 
-    @PostMapping("/")
-    public ResponseEntity<?> payDebit(@Valid @RequestBody PaymentRequest req) {
-        var account = bankAccounts.findById(req.accountId());
+    @Autowired
+    public PaymentCommand(PaymentService paymentService, PaymentMapper paymentMapper) {
+        this.paymentService = paymentService;
+        this.paymentMapper = paymentMapper;
+    }
 
-        paymentService.
-        accountService.payWithDebit(acc, req.amount(), card, req.description());
+    @PostMapping("/{accountId}/payments/")
+    public ResponseEntity<?> pay(@PathVariable String accountId, @Valid @RequestBody PaymentRequest request) {
+        paymentService.pay(paymentMapper.toDomain(request, UUID.fromString(accountId)));
         return ResponseEntity.accepted().build();
     }
 
+
     public record PaymentRequest(
-            @NotNull UUID accountId,
             @NotNull UUID cardId,
             @NotNull BigDecimal amount,
             String description
-    ) {}
+    ) {
+    }
 
 }

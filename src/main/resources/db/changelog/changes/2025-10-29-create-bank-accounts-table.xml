@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="0" author="admin">
+    <changeSet id="2025-10-31-create-bank-accounts-table" author="reyes">
+        <createTable tableName="bank_accounts">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="iban" type="VARCHAR(34)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="balance" type="DECIMAL(19,2)" defaultValueNumeric="0.00">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
 
+        <addForeignKeyConstraint
+                baseTableName="bank_accounts"
+                baseColumnNames="user_id"
+                constraintName="fk_bank_accounts_user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_bank_accounts_user_id" tableName="bank_accounts">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_bank_accounts_iban" tableName="bank_accounts">
+            <column name="iban"/>
+        </createIndex>
     </changeSet>
+
 </databaseChangeLog>

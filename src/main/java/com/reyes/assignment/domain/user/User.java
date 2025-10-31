@@ -1,4 +1,4 @@
-package com.reyes.assignment.domain;
+package com.reyes.assignment.domain.user;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
